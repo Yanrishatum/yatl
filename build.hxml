@@ -1,0 +1,4 @@
+-cp .
+-main Tweentest
+-D dump=pretty
+--interp
