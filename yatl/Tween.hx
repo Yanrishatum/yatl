@@ -77,6 +77,8 @@ class Tween
     }
   }
   
+  // Todo: Reverse
+  
   public function new(duration:Float = 1, ?ease:Float->Float)
   {
     this._elapsed = 0;
