@@ -164,7 +164,7 @@ class Tween
   }
   
   /** Update the tween with specified delta-time. **/
-  public function update(delta:Float):Void
+  public function update(delta:Float):Bool
   {
     if (state == TweenState.Running)
     {
@@ -199,6 +199,7 @@ class Tween
         if (!loop) state = TweenState.Finished;
         onTweenFinish();
         TweenMacro.emit(onFinish);
+        return true;
       }
       else
       {
@@ -206,6 +207,7 @@ class Tween
         _t = applyEase(_percent);
         apply();
         TweenMacro.emit(onUpdate);
+        return false;
       }
     }
   }
