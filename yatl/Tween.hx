@@ -120,7 +120,7 @@ class Tween
     * Note that it calls apply() and all corresponding callbacks on start. **/
   public function start(reset:Bool = true):Void
   {
-    if (reset || state == TweenState.Idle)
+    if (reset || (state == TweenState.Idle || state == TweenState.Finished))
     {
       if (reverse)
       {
@@ -196,7 +196,7 @@ class Tween
         }
         apply();
         TweenMacro.emit(onUpdate);
-        if (!loop) state = TweenState.Idle;
+        if (!loop) state = TweenState.Finished;
         onTweenFinish();
         TweenMacro.emit(onFinish);
       }
@@ -213,7 +213,7 @@ class Tween
   /** Cancel the tween if it's paused or running. **/
   public function cancel():Void
   {
-    if (state != TweenState.Idle)
+    if (state != TweenState.Idle && state != TweenState.Finished)
     {
       state = TweenState.Idle;
       onTweenCancel();
