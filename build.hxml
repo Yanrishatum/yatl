@@ -1,4 +1,5 @@
 -cp .
+-lib msignal
 -main Tweentest
 -D dump=pretty
 --interp

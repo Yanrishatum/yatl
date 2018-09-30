@@ -1,5 +1,9 @@
 package yatl;
 
+#if msignal
+import msignal.Signal.Signal1;
+#end
+
 /**
  * Basic tweener
  * Is implementation agnostic, hence you need to come up with update system for it yourself.
@@ -12,6 +16,20 @@ class Tween
   private var _t:Float;
   private var _percent:Float;
   
+  #if msignal
+  /** Fired when start() fuction called and tweener reset/was not running.. */
+  public var onStart:Signal1<Tween> = new Signal1();
+  /** Fired when tweener finishes. */
+  public var onFinish:Siganl1<Tween> = new Signal1();
+  /** Fired after tweener calls apply(). */
+  public var onUpdate:Siganl1<Tween> = new Signal1();
+  /** Fired when cancel() function called and tweener was not idle. */ 
+  public var onCancel:Siganl1<Tween> = new Signal1();
+  /** Fired when tweener was paused. */
+  public var onPause:Siganl1<Tween> = new Signal1();
+  /** Fired when tweener was unpaused. */
+  public var onUnpause:Siganl1<Tween> = new Signal1();
+  #else
   /** Fired when start() fuction called and tweener reset/was not running.. */
   public dynamic function onStart(t:Tween):Void { }
   /** Fired when tweener finishes. */
@@ -24,6 +42,7 @@ class Tween
   public dynamic function onPause(t:Tween):Void { }
   /** Fired when tweener was unpaused. */
   public dynamic function onUnpause(t:Tween):Void { }
+  #end
   
   /** Returns the progress of the tweener (value between 0..1)*/
   public var percent(get, set):Float;
@@ -38,7 +57,7 @@ class Tween
     if (state == TweenState.Running)
     {
       apply();
-      onUpdate(this);
+      TweenMacro.emit(onUpdate);
     }
     return v;
   }
@@ -70,17 +89,21 @@ class Tween
       if (newState != state)
       {
         state = newState;
-        if (v) onPause(this);
-        else onUnpause(this);
+        if (v) TweenMacro.emit(onPause);
+        else TweenMacro.emit(onUnpause);
       }
       return v;
     }
   }
   
   // Todo: Reverse
+  public var loop:Bool;
+  public var reverse:Bool;
   
-  public function new(duration:Float = 1, ?ease:Float->Float)
+  public function new(duration:Float = 1, ?ease:Float->Float, loop:Bool = false)
   {
+    this.loop = loop;
+    this.reverse = false;
     this._elapsed = 0;
     this._duration = duration;
     this.ease = ease;
@@ -99,13 +122,22 @@ class Tween
   {
     if (reset || state == TweenState.Idle)
     {
-      _elapsed = 0;
-      _percent = 0;
-      _t = applyEase(0);
+      if (reverse)
+      {
+        _elapsed = _duration;
+        _percent = 1;
+        _t = applyEase(1);
+      }
+      else
+      {
+        _elapsed = 0;
+        _percent = 0;
+        _t = applyEase(0);
+      }
       state = TweenState.Running;
-      onStart(this);
+      TweenMacro.emit(onStart);
       apply();
-      onUpdate(this);
+      TweenMacro.emit(onUpdate);
     }
     else if (state == TweenState.Paused) resume();
     
@@ -117,7 +149,7 @@ class Tween
     if (state == TweenState.Running)
     {
       state = TweenState.Paused;
-      onPause(this);
+      TweenMacro.emit(onPause);
     }
   }
   
@@ -127,7 +159,7 @@ class Tween
     if (state == TweenState.Paused)
     {
       state = TweenState.Running;
-      onUnpause(this);
+      TweenMacro.emit(onUnpause);
     }
   }
   
@@ -136,25 +168,44 @@ class Tween
   {
     if (state == TweenState.Running)
     {
-      _elapsed += delta;
-      
-      if (_elapsed > _duration)
+      var finished:Bool = 
+      if (reverse)
       {
-        _elapsed = _duration;
-        _percent = 1;
-        _t = applyEase(1);
+        _elapsed -= delta;
+        _elapsed <= 0;
+      }
+      else 
+      {
+        _elapsed += delta;
+        _elapsed >= _duration;
+      }
+      
+      if (finished)
+      {
+        if (reverse)
+        {
+          _elapsed = 0;
+          _percent = 0;
+          _t = applyEase(0);
+        }
+        else 
+        {
+          _elapsed = _duration;
+          _percent = 1;
+          _t = applyEase(1);
+        }
         apply();
-        onUpdate(this);
-        state = TweenState.Idle;
+        TweenMacro.emit(onUpdate);
+        if (!loop) state = TweenState.Idle;
         onTweenFinish();
-        onFinish(this);
+        TweenMacro.emit(onFinish);
       }
       else
       {
         _percent = _elapsed / _duration;
         _t = applyEase(_percent);
         apply();
-        onUpdate(this);
+        TweenMacro.emit(onUpdate);
       }
     }
   }
@@ -166,8 +217,20 @@ class Tween
     {
       state = TweenState.Idle;
       onTweenCancel();
-      onCancel(this);
+      TweenMacro.emit(onCancel);
     }
+  }
+  
+  public function dispose():Void
+  {
+    #if msignal
+    onStart.removeAll();
+    onCancel.removeAll();
+    onFinish.removeAll();
+    onPause.removeAll();
+    onUnpause.removeAll();
+    onUpdate.removeAll();
+    #end
   }
   
   /** Override this to apply your logic during update tick. **/

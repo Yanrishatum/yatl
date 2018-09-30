@@ -7,6 +7,15 @@ using haxe.macro.TypeTools;
 
 class TweenMacro
 {
+  public static macro function emit(what:Expr):Expr
+  {
+    if (Context.defined("msignal"))
+    {
+      return macro $what.dispatch(this);
+    }
+    return macro $what(this);
+  }
+  
   #if macro
   
   private static function buildVariable()

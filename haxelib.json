@@ -1,0 +1,11 @@
+{
+  "name": "yatl",
+  "description": "YATL - Yet Another (Haxe) Tweening Library",
+  "classPath": "yatl",
+  "dependencies": {},
+  "contributors": [ "Yanrishatum" ],
+  "url": "https://github.com/yanrishatum/yatl",
+  "license": "Public",
+  "version": "1.0.0",
+  "releasenote": "Initial release"
+}
