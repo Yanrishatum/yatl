@@ -6,6 +6,6 @@
   "contributors": [ "Yanrishatum" ],
   "url": "https://github.com/yanrishatum/yatl",
   "license": "Public",
-  "version": "1.0.0",
-  "releasenote": "Initial release"
+  "version": "1.1.0",
+  "releasenote": "Added msignal optional dependency support; Added reverse and loop modes."
 }
