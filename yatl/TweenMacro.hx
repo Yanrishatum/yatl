@@ -93,6 +93,42 @@ class TweenMacro
       }
     }
     
+    for (meta in cl.meta.extract(":apply"))
+    {
+      if (meta.params != null && meta.params.length > 0)
+      {
+        apply.push(macro var target = this._target);
+        for (e in meta.params)
+          apply.push(e);
+      }
+      else 
+      {
+        Context.warning("@:apply meta requries apply expression!", Context.currentPos());
+      }
+    }
+    
+    for (meta in cl.meta.extract(":setup"))
+    {
+      if (meta.params != null && meta.params.length > 0)
+      {
+        for (e in meta.params)
+          setup.push(e);
+      }
+      else 
+      {
+        Context.warning("@:apply meta requries apply expression!", Context.currentPos());
+      }
+    }
+    
+    // for (meta in cl.meta.extract(":arg"))
+    // {
+    //   if (meta.params != null && meta.params > 1)
+    //   {
+    //     meta.params[1]
+    //     // args.push({ name: getIdent(meta.params[0]), })
+    //   }
+    // }
+    
     args.push( { name: "duration", opt: true, type: macro :Float } );
     args.push( { name: "ease", opt: true, type: macro :Float->Float } );
     args.push( { name: "start", opt: true, type: macro :Bool, value: macro true } );
@@ -113,6 +149,15 @@ class TweenMacro
       kind: FFun({
         args: [],
         expr: macro $b{apply},
+        ret: macro :Void
+      }),
+      pos: Context.currentPos()
+    });
+    fields.push({
+      name: "dispose", access: [AOverride, APublic],
+      kind: FFun({
+        args: [],
+        expr: macro { super.dispose(); this._target = null; },
         ret: macro :Void
       }),
       pos: Context.currentPos()
@@ -157,7 +202,7 @@ class TweenMacro
   {
     switch(kind)
     {
-      case AccNo, AccNever, AccInline, AccRequire(_, _): return false;
+      case AccNo, AccNever, AccInline, AccRequire(_, _), AccCtor: return false;
       case AccCall, AccResolve, AccNormal: return true;
     }
   }

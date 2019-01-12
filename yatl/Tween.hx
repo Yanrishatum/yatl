@@ -1,7 +1,7 @@
 package yatl;
 
 #if msignal
-import msignal.Signal.Signal1;
+import msignal.Signal;
 #end
 
 /**
@@ -20,15 +20,15 @@ class Tween
   /** Fired when start() fuction called and tweener reset/was not running.. */
   public var onStart:Signal1<Tween> = new Signal1();
   /** Fired when tweener finishes. */
-  public var onFinish:Siganl1<Tween> = new Signal1();
+  public var onFinish:Signal1<Tween> = new Signal1();
   /** Fired after tweener calls apply(). */
-  public var onUpdate:Siganl1<Tween> = new Signal1();
+  public var onUpdate:Signal1<Tween> = new Signal1();
   /** Fired when cancel() function called and tweener was not idle. */ 
-  public var onCancel:Siganl1<Tween> = new Signal1();
+  public var onCancel:Signal1<Tween> = new Signal1();
   /** Fired when tweener was paused. */
-  public var onPause:Siganl1<Tween> = new Signal1();
+  public var onPause:Signal1<Tween> = new Signal1();
   /** Fired when tweener was unpaused. */
-  public var onUnpause:Siganl1<Tween> = new Signal1();
+  public var onUnpause:Signal1<Tween> = new Signal1();
   #else
   /** Fired when start() fuction called and tweener reset/was not running.. */
   public dynamic function onStart(t:Tween):Void { }
@@ -210,6 +210,7 @@ class Tween
         return false;
       }
     }
+    return false;
   }
   
   /** Cancel the tween if it's paused or running. **/
