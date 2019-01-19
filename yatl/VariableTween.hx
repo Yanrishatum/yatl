@@ -10,16 +10,12 @@ class VariableTween<T> extends Tween
   
   inline function get_target() return _target;
   
+  override public function dispose()
+  {
+    super.dispose();
+    _target = null;
+  }
+  
   //public function setup<K:T>(target:T, ...fields, ?duration:Float, ?ease:Float->Float):Void
-  
-  override private function onTweenCancel():Void
-  {
-    _target = null;
-  }
-  
-  override private function onTweenFinish():Void
-  {
-    _target = null;
-  }
   
 }

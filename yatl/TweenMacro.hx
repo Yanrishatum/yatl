@@ -153,15 +153,6 @@ class TweenMacro
       }),
       pos: Context.currentPos()
     });
-    fields.push({
-      name: "dispose", access: [AOverride, APublic],
-      kind: FFun({
-        args: [],
-        expr: macro { super.dispose(); this._target = null; },
-        ret: macro :Void
-      }),
-      pos: Context.currentPos()
-    });
     
     return fields;
   }

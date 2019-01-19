@@ -10,6 +10,10 @@ import msignal.Signal;
  */
 class Tween
 {
+  /**
+    If above 0, will delay update loop and decrease variable until it reaches 0.
+  **/
+  public var delay:Float = 0;
   
   private var _duration:Float;
   private var _elapsed:Float;
@@ -168,6 +172,15 @@ class Tween
   {
     if (state == TweenState.Running)
     {
+      if (delay != 0) {
+        delay -= delta;
+        if (delay <= 0) {
+          if (reverse) _elapsed += delay;
+          else _elapsed -= delay;
+          delay = 0;
+        }
+        else return false;
+      }
       var finished:Bool = 
       if (reverse)
       {
